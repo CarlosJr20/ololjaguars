@@ -1,0 +1,49 @@
+<style type="text/css">
+    @media screen and (max-width:479px) { #section_navigation { display:none!important; } }
+</style>
+<section id="section_navigation">
+    <a href=""></a>
+</section>
+<select id="section_select" class="hide_desktop">
+</select>
+
+<script>
+   $(document).ready(function() {
+    const sectionNav = $("#section_navigation");
+    let selectNavCreated = false;
+
+    function updateNav() {
+        if ($(window).width() < 594) {
+            if (!selectNavCreated) {
+                const selectNav = $("<select>").attr("id", "section_select");
+                sectionNav.find("a").each(function() {
+                    const option = $("<option>").val($(this).data("section")).text($(this).text());
+                    selectNav.append(option);
+                    $(this).remove();
+                });
+                sectionNav.append(selectNav);
+                selectNavCreated = true;
+                selectNav.change(function() {
+                    const selectedSection = $(this).val();
+                    const newUrl = "?pg=2022%20-%202023%20Academic&Section=" + selectedSection;
+                    history.pushState({}, null, newUrl);
+                    $(".js-mod").load(newUrl + " .js-mod > *");
+                });
+            }
+        } else {
+            const selectNav = $("#section_select");
+            if (selectNav.length) {
+                const options = selectNav.find("option");
+                options.each(function() {
+                    const anchor = $("<a>").data("section", $(this).val()).text($(this).text());
+                    sectionNav.append(anchor);
+                });
+                selectNav.remove();
+                selectNavCreated = false;
+            }
+        }
+    }
+    $(window).resize(updateNav);
+    updateNav();
+});
+</script>
