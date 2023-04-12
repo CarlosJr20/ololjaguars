@@ -10,40 +10,25 @@
 <script>
    $(document).ready(function() {
     const sectionNav = $("#section_navigation");
-    let selectNavCreated = false;
+    const selectNav = $("<select>").attr({id: "section_select", class: "hide_desktop"});
+    sectionNav.find("a").each(function() {
+      const option = $("<option>").val($(this).data("section")).text($(this).text());
+      selectNav.append(option);
+    });
 
-    function updateNav() {
-        if ($(window).width() < 594) {
-            if (!selectNavCreated) {
-                const selectNav = $("<select>").attr("id", "section_select");
-                sectionNav.find("a").each(function() {
-                    const option = $("<option>").val($(this).data("section")).text($(this).text());
-                    selectNav.append(option);
-                    $(this).remove();
-                });
-                sectionNav.append(selectNav);
-                selectNavCreated = true;
-                selectNav.change(function() {
-                    const selectedSection = $(this).val();
-                    const newUrl = "?pg=2022%20-%202023%20Academic&Section=" + selectedSection;
-                    history.pushState({}, null, newUrl);
-                    $(".js-mod").load(newUrl + " .js-mod > *");
-                });
-            }
+    selectNav.insertAfter(sectionNav);
+    selectNav.change(function() {
+        const url = window.location.href;
+        const indexOfEquals = url.indexOf('=');
+        const sectionIndex = url.indexOf('&Section=');
+        let newUrl;
+        if (sectionIndex === -1) {
+            newUrl = url + "&Section=" + $(this).val();
         } else {
-            const selectNav = $("#section_select");
-            if (selectNav.length) {
-                const options = selectNav.find("option");
-                options.each(function() {
-                    const anchor = $("<a>").data("section", $(this).val()).text($(this).text());
-                    sectionNav.append(anchor);
-                });
-                selectNav.remove();
-                selectNavCreated = false;
-            }
+            newUrl = url.substring(0, sectionIndex) + "&Section=" + $(this).val();
         }
-    }
-    $(window).resize(updateNav);
-    updateNav();
-});
+        history.pushState({}, null, newUrl);
+        $("#sn_content").load(newUrl + " #sn_content > *");
+    });
+  });
 </script>
